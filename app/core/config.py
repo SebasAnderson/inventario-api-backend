@@ -9,11 +9,11 @@ class Settings(BaseSettings):
 
     # Database Settings
     POSTGRES_SERVER: str = "localhost"
-    POSTGRES_PORT: int = 5432
+    POSTGRES_PORT: int = 5229
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "comic_store_db"
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/comic_store_db"
+    DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost:5229/comic_store_db"
 
     model_config = SettingsConfigDict(
         env_file=".env",
