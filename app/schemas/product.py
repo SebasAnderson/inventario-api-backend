@@ -1,7 +1,7 @@
 from decimal import Decimal
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-from app.schemas.common import ProductType
+from app.schemas.common import ProductSortBy, ProductType, SortOrder
 
 EDITORIAL_PRODUCT_TYPES = {ProductType.MANGA, ProductType.COMIC}
 COLLECTIBLE_PRODUCT_TYPES = {ProductType.FIGURA, ProductType.MERCHANDISING}
@@ -123,3 +123,31 @@ class ProductResponse(ProductBase):
     id: int = Field(..., examples=[1])
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProductFilters(BaseModel):
+    """Filtros combinados y parámetros de ordenamiento para búsqueda de productos."""
+
+    search: Optional[str] = None
+    titulo: Optional[str] = None
+    numero_tomo: Optional[str] = None
+    isbn: Optional[str] = None
+    tipo_producto: Optional[ProductType] = None
+    id_franquicia: Optional[int] = None
+    id_editorial: Optional[int] = None
+    id_demografia: Optional[int] = None
+    precio_min: Optional[Decimal] = None
+    precio_max: Optional[Decimal] = None
+    en_stock: Optional[bool] = None
+    sort_by: ProductSortBy = ProductSortBy.ID
+    sort_order: SortOrder = SortOrder.ASC
+
+
+class ProductSearchResponse(BaseModel):
+    total: int = Field(..., ge=0, examples=[25])
+    page: int = Field(..., ge=1, examples=[1])
+    limit: int = Field(..., ge=1, examples=[20])
+    total_pages: int = Field(..., ge=0, examples=[2])
+    has_next: bool = Field(..., examples=[True])
+    has_prev: bool = Field(..., examples=[False])
+    items: List[ProductResponse]

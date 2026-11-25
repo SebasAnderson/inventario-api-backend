@@ -26,8 +26,8 @@ Sistema backend profesional para la administración de inventario, catálogo, mo
 | **Sprint 5** | Semana 5 | Conexión ORM (SQLAlchemy) y Migraciones (Alembic) | ✅ Completado |
 | **Sprint 6** | Semana 6 | Módulo CRUD de Editoriales y Categorías | ✅ Completado |
 | **Sprint 7** | Semana 7 | Módulo CRUD de Catálogo de Productos (Manga / Cómics / Figuras) | ✅ Completado |
-| **Sprint 8** | Semana 8 | Buscador y Filtros Avanzados con Paginación | ⏳ Siguiente |
-| **Sprint 9** | Semana 9 | Módulo de Usuarios, Roles y Cifrado de Contraseñas (Bcrypt) | ⏳ Pendiente |
+| **Sprint 8** | Semana 8 | Buscador y Filtros Avanzados con Paginación | ✅ Completado |
+| **Sprint 9** | Semana 9 | Módulo de Usuarios, Roles y Cifrado de Contraseñas (Bcrypt) | ⏳ Siguiente |
 | **Sprint 10** | Semana 10 | Autenticación JWT y Protección de Rutas | ⏳ Pendiente |
 | **Sprint 11** | Semana 11 | Módulo de Movimientos de Inventario (Ingresos y Ventas) | ⏳ Pendiente |
 | **Sprint 12** | Semana 12 | Alertas de Stock Mínimo | ⏳ Pendiente |

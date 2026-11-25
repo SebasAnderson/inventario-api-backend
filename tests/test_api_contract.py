@@ -27,6 +27,7 @@ def test_products_endpoint_in_openapi():
     assert response.status_code == 200
     paths = response.json()["paths"]
     assert set(paths["/api/v1/products/"].keys()) >= {"get", "post"}
+    assert "get" in paths["/api/v1/products/search"]
     assert set(paths["/api/v1/products/{product_id}"].keys()) >= {"get", "put", "delete"}
 
 

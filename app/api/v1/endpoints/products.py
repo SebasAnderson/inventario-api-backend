@@ -1,3 +1,4 @@
+import math
 from decimal import Decimal
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Response, status
@@ -12,10 +13,12 @@ from app.crud import (
 )
 from app.db.session import get_db
 from app.models.product import Product
-from app.schemas.common import ProductType
+from app.schemas.common import ProductSortBy, ProductType, SortOrder
 from app.schemas.product import (
     ProductCreate,
+    ProductFilters,
     ProductResponse,
+    ProductSearchResponse,
     ProductUpdate,
     validate_product_type_requirements,
 )
@@ -38,6 +41,51 @@ MOCK_LOW_STOCK_SAMPLE = ProductResponse(
     isbn="978-987-724-401-2",
     marca_fabricante=None,
 )
+
+
+def _strip_optional_query(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    stripped = value.strip()
+    return stripped or None
+
+
+def get_product_filters(
+    search: Optional[str] = Query(None, max_length=100, description="Búsqueda general por título, descripción o ISBN"),
+    titulo: Optional[str] = Query(None, max_length=255, description="Filtrar por coincidencia parcial en el título"),
+    numero_tomo: Optional[str] = Query(None, max_length=50, description="Filtrar por número de tomo exacto (ej. '1', 'Tomo Único')"),
+    isbn: Optional[str] = Query(None, max_length=20, description="Filtrar por coincidencia parcial o exacta de ISBN"),
+    tipo_producto: Optional[ProductType] = Query(None, description="Filtrar por tipo de producto"),
+    id_franquicia: Optional[int] = Query(None, ge=1, description="Filtrar por ID de franquicia"),
+    id_editorial: Optional[int] = Query(None, ge=1, description="Filtrar por ID de editorial"),
+    id_demografia: Optional[int] = Query(None, ge=1, description="Filtrar por ID de demografía"),
+    precio_min: Optional[Decimal] = Query(None, ge=0, description="Precio mínimo de venta"),
+    precio_max: Optional[Decimal] = Query(None, ge=0, description="Precio máximo de venta"),
+    en_stock: Optional[bool] = Query(None, description="True: stock > 0; False: stock == 0"),
+    sort_by: ProductSortBy = Query(ProductSortBy.ID, description="Campo por el cual ordenar los resultados"),
+    sort_order: SortOrder = Query(SortOrder.ASC, description="Dirección de ordenamiento (asc o desc)"),
+) -> ProductFilters:
+    """Construye y valida los filtros combinados de búsqueda de productos."""
+    if precio_min is not None and precio_max is not None and precio_min > precio_max:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El parámetro 'precio_min' no puede ser mayor que 'precio_max'.",
+        )
+    return ProductFilters(
+        search=_strip_optional_query(search),
+        titulo=_strip_optional_query(titulo),
+        numero_tomo=_strip_optional_query(numero_tomo),
+        isbn=_strip_optional_query(isbn),
+        tipo_producto=tipo_producto,
+        id_franquicia=id_franquicia,
+        id_editorial=id_editorial,
+        id_demografia=id_demografia,
+        precio_min=precio_min,
+        precio_max=precio_max,
+        en_stock=en_stock,
+        sort_by=sort_by,
+        sort_order=sort_order,
+    )
 
 
 def _get_product_or_404(db: Session, product_id: int) -> Product:
@@ -88,15 +136,43 @@ def _ensure_unique_isbn(
 @router.get(
     "/",
     response_model=List[ProductResponse],
-    summary="Listar productos",
-    description="Obtiene el catálogo de productos registrados en la base de datos con soporte para paginación básica.",
+    summary="Listar y filtrar productos",
+    description="Obtiene el catálogo de productos con soporte para paginación (skip/limit) y filtros combinados (título, tomo, editorial, franquicia, demografía, precio y stock).",
 )
 def list_products(
     skip: int = Query(0, ge=0, description="Número de registros a omitir para paginación"),
     limit: int = Query(20, ge=1, le=100, description="Límite de registros por página"),
+    filters: ProductFilters = Depends(get_product_filters),
     db: Session = Depends(get_db),
 ):
-    return crud_product.get_all(db, skip=skip, limit=limit)
+    items, _ = crud_product.search(db, filters=filters, skip=skip, limit=limit)
+    return items
+
+
+@router.get(
+    "/search",
+    response_model=ProductSearchResponse,
+    summary="Buscador avanzado con paginación estructurada",
+    description="Busca productos por título, número de tomo, ISBN o filtros combinados devolviendo metadatos completos de paginación (total, página actual, total de páginas).",
+)
+def search_products(
+    page: int = Query(1, ge=1, description="Número de página (comienza en 1)"),
+    limit: int = Query(20, ge=1, le=100, description="Cantidad de resultados por página"),
+    filters: ProductFilters = Depends(get_product_filters),
+    db: Session = Depends(get_db),
+):
+    skip = (page - 1) * limit
+    items, total = crud_product.search(db, filters=filters, skip=skip, limit=limit)
+    total_pages = math.ceil(total / limit) if total > 0 else 0
+    return ProductSearchResponse(
+        total=total,
+        page=page,
+        limit=limit,
+        total_pages=total_pages,
+        has_next=page < total_pages,
+        has_prev=page > 1 and total > 0,
+        items=items,
+    )
 
 
 @router.get(
