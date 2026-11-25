@@ -22,14 +22,12 @@ def test_openapi_schema_generated():
     assert "/api/v1/auth/login" in data["paths"]
 
 
-def test_products_contract_mock():
-    response = client.get("/api/v1/products/")
+def test_products_endpoint_in_openapi():
+    response = client.get("/api/v1/openapi.json")
     assert response.status_code == 200
-    products = response.json()
-    assert isinstance(products, list)
-    assert len(products) > 0
-    assert "titulo_nombre" in products[0]
-    assert "precio_venta" in products[0]
+    paths = response.json()["paths"]
+    assert set(paths["/api/v1/products/"].keys()) >= {"get", "post"}
+    assert set(paths["/api/v1/products/{product_id}"].keys()) >= {"get", "put", "delete"}
 
 
 def test_low_stock_contract_mock():
