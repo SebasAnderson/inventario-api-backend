@@ -2,7 +2,9 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class DemographicBase(BaseModel):
-    nombre: str = Field(..., max_length=100, examples=["Shonen"])
+    nombre: str = Field(..., min_length=1, max_length=100, examples=["Shonen"])
+
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class DemographicCreate(DemographicBase):
@@ -10,7 +12,9 @@ class DemographicCreate(DemographicBase):
 
 
 class DemographicUpdate(BaseModel):
-    nombre: str | None = Field(None, max_length=100, examples=["Seinen"])
+    nombre: str | None = Field(None, min_length=1, max_length=100, examples=["Seinen"])
+
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class DemographicResponse(DemographicBase):

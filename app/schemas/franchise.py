@@ -2,7 +2,9 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class FranchiseBase(BaseModel):
-    nombre: str = Field(..., max_length=100, examples=["Dragon Ball"])
+    nombre: str = Field(..., min_length=1, max_length=100, examples=["Dragon Ball"])
+
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class FranchiseCreate(FranchiseBase):
@@ -10,7 +12,9 @@ class FranchiseCreate(FranchiseBase):
 
 
 class FranchiseUpdate(BaseModel):
-    nombre: str | None = Field(None, max_length=100, examples=["Dragon Ball Super"])
+    nombre: str | None = Field(None, min_length=1, max_length=100, examples=["Dragon Ball Super"])
+
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class FranchiseResponse(FranchiseBase):

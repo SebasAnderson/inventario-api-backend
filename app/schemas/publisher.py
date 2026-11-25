@@ -2,7 +2,9 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class PublisherBase(BaseModel):
-    nombre: str = Field(..., max_length=100, examples=["Editorial Ivrea"])
+    nombre: str = Field(..., min_length=1, max_length=100, examples=["Editorial Ivrea"])
+
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class PublisherCreate(PublisherBase):
@@ -10,7 +12,9 @@ class PublisherCreate(PublisherBase):
 
 
 class PublisherUpdate(BaseModel):
-    nombre: str | None = Field(None, max_length=100, examples=["Editorial Ivrea Argentina"])
+    nombre: str | None = Field(None, min_length=1, max_length=100, examples=["Editorial Ivrea Argentina"])
+
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class PublisherResponse(PublisherBase):

@@ -24,8 +24,8 @@ Sistema backend profesional para la administración de inventario, catálogo, mo
 | **Sprint 3** | Semana 3 | Setup del Proyecto, Repositorio Git y Arquitectura Base | ✅ Completado |
 | **Sprint 4** | Semana 4 | Diseño del Contrato de la API (DTOs, Schemas y Swagger) | ✅ Completado |
 | **Sprint 5** | Semana 5 | Conexión ORM (SQLAlchemy) y Migraciones (Alembic) | ✅ Completado |
-| **Sprint 6** | Semana 6 | Módulo CRUD de Editoriales y Categorías | ⏳ Siguiente |
-| **Sprint 7** | Semana 7 | Módulo CRUD de Catálogo de Productos (Manga / Cómics / Figuras) | ⏳ Pendiente |
+| **Sprint 6** | Semana 6 | Módulo CRUD de Editoriales y Categorías | ✅ Completado |
+| **Sprint 7** | Semana 7 | Módulo CRUD de Catálogo de Productos (Manga / Cómics / Figuras) | ⏳ Siguiente |
 | **Sprint 8** | Semana 8 | Buscador y Filtros Avanzados con Paginación | ⏳ Pendiente |
 | **Sprint 9** | Semana 9 | Módulo de Usuarios, Roles y Cifrado de Contraseñas (Bcrypt) | ⏳ Pendiente |
 | **Sprint 10** | Semana 10 | Autenticación JWT y Protección de Rutas | ⏳ Pendiente |
